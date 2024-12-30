@@ -153,10 +153,17 @@ jobs:
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
     - name: 设置RAX3000M-eMMC的eMMC使用highspeed
+      if: github.event.inputs.FLASH_TYPE == 'emmc'
       run: |
         cd openwrt
         if ! grep -q 'cap-mmc-highspeed' "${{ env.RAX3000M_EMMC_DTS_FILE }}"; then
                 sed -i -e '/bus-width = <8>;/ a\	cap-mmc-highspeed;' "${{ env.RAX3000M_EMMC_DTS_FILE }}"
+        fi
+
+    - name: Flash Type
+      run: |
+        if [[ "${{ github.event.inputs.WIFI_DRIVER }}" == "nand" ]]; then
+          sed -Ei 's/cmcc_rax3000m-emmc/cmcc_rax3000m/g' openwrt/.config
         fi
 
     - name: 设置LAN IP地址（路由器登录地址）
