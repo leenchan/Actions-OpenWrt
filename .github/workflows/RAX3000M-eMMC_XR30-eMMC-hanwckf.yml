@@ -8,12 +8,20 @@
 # Description: Build OpenWrt using GitHub Actions
 #
 ###############手动修改##############
-name: RAX3000M-eMMC_XR30-eMMC-hanwckf
+name: RAX3000M-hanwckf
 
 on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      FLASH_TYPE:
+        description: 'Choose your flash type'
+        required: true
+        default: 'emmc'
+        type: choice
+        options:
+        - emmc
+        - nand
       LAN_IP:
         description: 'Set LAN IP Address'
         required: true
@@ -209,7 +217,7 @@ jobs:
         sed -i 's/CONFIG_PACKAGE_lua-cjson=y/CONFIG_WIFI_NORMAL_SETTING=y/g' .config
 
     - name: 取消编译dockerman
-      if: github.event.inputs.NO_DOCKERMAN == 'true'
+      if: github.event.inputs.NO_DOCKERMAN == 'true' && github.event.inputs.FLASH_TYPE == 'emmc'
       run: |
         cd openwrt
         sed -i '/CONFIG_PACKAGE_luci-app-dockerman=y/d' .config
